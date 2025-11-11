@@ -1,0 +1,59 @@
+﻿@page "/results"
+@using CS464Proj.Utilities
+@using MudBlazor
+@inject AppState State
+@inject NavigationManager NavigationManager
+<MudPaper Class="pa-4">
+    <MudItem>
+        <MudIconButton Icon="@Icons.Material.Filled.ArrowBack"
+                       Color="Color.Primary"
+                       Size="Size.Medium"
+                       OnClick="@ReturnHome"
+                       aria-label="Back to home" />
+    </MudItem>
+    <MudTable T=ResultDisplay Items="@AllResults" Hover="true" Bordered="true" Striped="true">
+        <HeaderContent>
+            <MudTh>Experiment</MudTh>
+            <MudTh>Trial</MudTh>
+            <MudTh>Time (ms)</MudTh>
+            <MudTh>Accuracy (1 = correct, 0 = incorrect)</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd>@context.ExperimentName</MudTd>
+            <MudTd>@context.TrialNumber</MudTd>
+            <MudTd>@context.Time</MudTd>
+            <MudTd>@context.Accuracy</MudTd>
+        </RowTemplate>
+    </MudTable>
+</MudPaper>
+
+@code {
+    public List<ResultDisplay> AllResults =>
+        new List<ResultDisplay>()
+            .Concat(State.SingleBoxResults?.Select((r, i) => new ResultDisplay("Single Box", i + 1, r)) ?? Enumerable.Empty<ResultDisplay>())
+            .Concat(State.DoubleBoxResults?.Select((r, i) => new ResultDisplay("Double Box", i + 1, r)) ?? Enumerable.Empty<ResultDisplay>())
+            .Concat(State.CalendarResults?.Select((r, i) => new ResultDisplay("Calendar", i + 1, r)) ?? Enumerable.Empty<ResultDisplay>())
+            .Concat(State.SmallCalendarResults?.Select((r, i) => new ResultDisplay("Small Calendar", i + 1, r)) ?? Enumerable.Empty<ResultDisplay>())
+            .ToList();
+
+    private void ReturnHome()
+    {
+        NavigationManager.NavigateTo("/");
+    }
+
+    public class ResultDisplay
+    {
+        public string ExperimentName { get; set; }
+        public int TrialNumber { get; set; }
+        public double Time { get; set; }
+        public double Accuracy { get; set; }
+
+        public ResultDisplay(string name, int trial, Result result)
+        {
+            ExperimentName = name;
+            TrialNumber = trial;
+            Time = result.TimeTaken;
+            Accuracy = result.Correct ? 100 : 0;
+        }
+    }
+}

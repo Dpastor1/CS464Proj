@@ -1,0 +1,165 @@
+﻿@page "/"
+@using CS464Proj.Utilities
+@inject AppState AppState
+@inject NavigationManager NavigationManager
+<MudContainer Class="mt-16">
+
+    <MudGrid Class="mt-8">
+        <MudItem xs="12" sm="6" md="6">
+            <MudCard Elevation="25">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h5" Align="Align.Center">
+                            Calendar Experiment
+                            <MudIcon Icon="@Icons.Material.Filled.CalendarMonth" Title="Favorite" />
+                            @if (AppState.CalendarCompletion)
+                            {
+                                <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success" Class="ml-2" />
+                            }
+                        </MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
+
+                <MudCardActions Class="d-flex justify-center">
+                    <MudButton Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               Size="Size.Large"
+                               Style="width:50%;"
+                               Disabled="@AppState.CalendarCompletion"
+                               OnClick="@NavigateToCalendarExperiment">
+                        @(AppState.CalendarCompletion ? "Completed" : "Go To Experiment")
+                    </MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+
+        @* Single Box Exp *@
+        <MudItem xs="12" sm="6" md="6">
+            <MudCard Elevation="25">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h5" Align="Align.Center">
+                            Single Text Box Experiment
+                            @if (AppState.SingleBoxCompletion)
+                            {
+                                <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success" Class="ml-2" />
+                            }
+                        </MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
+
+                <MudCardActions Class="d-flex justify-center">
+                    <MudButton Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               Size="Size.Large"
+                               Style="width:50%;"
+                               Disabled="@AppState.SingleBoxCompletion"
+                               OnClick="@NavigateToSingleBoxExperiment">
+                        @(AppState.SingleBoxCompletion ? "Completed" : "Go To Experiment")
+                    </MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+
+        <MudItem xs="12" sm="6" md="6">
+            @* Small Calendar Date Picker Card *@
+            <MudCard Elevation="25" Class="rounded-lg pb-4">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h5" Align="Align.Center">
+                            Small Calendar Experiment
+                            <MudIcon Icon="@Icons.Material.Filled.DateRange" Title="Favorite" />
+                            @if (AppState.SmallCalendarCompletion)
+                            {
+                                <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success" Class="ml-2" />
+                            }
+                        </MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudCardActions Class="d-flex justify-center">
+                    <MudButton Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               Size="Size.Large"
+                               Style="width:50%;"
+                               Disabled="@AppState.SmallCalendarCompletion"
+                               OnClick="@NavigateToSmallCalendarExperiment">
+                        @(AppState.SmallCalendarCompletion ? "Completed" : "Go To Experiment")
+                    </MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+
+        <MudItem xs="12" sm="6" md="6">
+            @* Double Box Date Picker *@
+            <MudCard Elevation="25" Class="rounded-lg pb-4">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h5" Align="Align.Center">Double Box DatePicker
+                            @if (AppState.DoubleBoxCompletion)
+                            {
+                                <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success" Class="ml-2" />
+                            }
+                        </MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudCardActions Class="d-flex justify-center">
+                    <MudButton Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               Size="Size.Large"
+                               Style="width:50%;"
+                               Disabled="@AppState.DoubleBoxCompletion"
+                               OnClick="@NavigateToDoubleBoxExpermiment">
+                        @(AppState.DoubleBoxCompletion ? "Completed" : "Go To Experiment")
+                    </MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+
+        @* Results Page  *@
+        @if (AppState.CalendarCompletion && AppState.SingleBoxCompletion && AppState.SmallCalendarCompletion && AppState.DoubleBoxCompletion)
+        {
+            <MudItem xs="12" sm="12" md="12">
+                <MudCard Elevation="25" Class="rounded-lg pb-4">
+                    <MudCardHeader>
+                        <CardHeaderContent>
+                            <MudText Typo="Typo.h5" Align="Align.Center">View Results </MudText>
+                        </CardHeaderContent>
+                    </MudCardHeader>
+                    <MudCardActions Class="d-flex justify-center">
+                        <MudButton Variant="Variant.Filled"
+                                   Color="Color.Primary"
+                                   Size="Size.Large"
+                                   FullWidth="true"
+                                   OnClick="@NavigateToResultsPage"> Click Here To View
+                        </MudButton>
+                    </MudCardActions>
+                </MudCard>
+            </MudItem>
+            }
+    </MudGrid>
+
+</MudContainer>
+
+@code{
+
+    private void NavigateToCalendarExperiment()
+    {
+        NavigationManager.NavigateTo("/cal");
+    }
+    private void NavigateToSingleBoxExperiment()
+    {
+        NavigationManager.NavigateTo("/singlebox");
+    }
+    private void NavigateToSmallCalendarExperiment()
+    {
+        NavigationManager.NavigateTo("/smallcal");
+    }
+    private void NavigateToDoubleBoxExpermiment()
+    {
+        NavigationManager.NavigateTo("/doublebox");
+    }
+    private void NavigateToResultsPage()
+    {
+        NavigationManager.NavigateTo("/results");
+    }
+}

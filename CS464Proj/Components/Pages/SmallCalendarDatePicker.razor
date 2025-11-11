@@ -1,0 +1,152 @@
+﻿@page "/smallcal"
+@using CS464Proj.Utilities
+@using System.Globalization
+@using System.Text
+@inject NavigationManager NavigationManager
+@inject AppState AppState
+
+<MudPaper Class="d-flex flex-column align-center justify-center p-8 mt-10 mx-auto" Style="max-width: 1000px;">
+    <MudGrid AlignItems="Center" Class="mb-2">
+        <MudItem>
+            <MudIconButton Icon="@Icons.Material.Filled.ArrowBack"
+                           Color="Color.Primary"
+                           Size="Size.Medium"
+                           OnClick="@ReturnHome"
+                           aria-label="Back to home" />
+        </MudItem>
+    </MudGrid>
+
+
+    <MudText Typo="Typo.h4" Align="Align.Center" GutterBottom="true">
+        Date Recognition Experiment
+    </MudText>
+
+    <MudDivider Class="my-4" />
+
+    @if (!start && !finished)
+    {
+        <MudText Typo="Typo.subtitle1" Align="Align.Center" Class="mb-4">
+            You will be shown random dates. Input the date shown as fast as possible at a comfortable pace.
+        </MudText>
+
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="beginRound" Class="mt-2 px-6">
+            Begin Experiment
+        </MudButton>
+    }
+    else
+    {
+        <MudCard Class="p-6 text-center my-4 shadow-lg" Elevation="0">
+            <MudText Typo="Typo.h6" Class="mb-2">
+                Input Date:
+            </MudText>
+            <MudText Typo="Typo.h5" Color="Color.Primary" Class="mb-4">
+                @randomDate.ToString("MMMM dd, yyyy")
+            </MudText>
+
+            <MudDatePicker Label="Select the date..." @bind-Date="_date" Class="mb-4" />
+
+            <MudButton Variant="Variant.Filled" Disabled="@finished" Color="Color.Success" OnClick="OnSaveButtonClick" Class="me-2">
+                Save Date
+            </MudButton>
+
+            @if (finishedRound)
+            {
+                <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="beginRound">
+                    Next Date
+                </MudButton>
+            }
+
+            <MudText Typo="Typo.caption" Class="mt-4 text-secondary">
+                Completed: @RoundsCompleted / 5
+            </MudText>
+        </MudCard>
+    }
+
+    @if (finished)
+    {
+        <MudText Typo="Typo.subtitle1" Align="Align.Center" Class="mb-4">
+            Congratulations! You have completed the experiment. Thank you for your participation.
+            Your results have been saved. Use the Return button to go back to the home page
+        </MudText>
+
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="ReturnHome" Class="mt-2 px-6">
+            Return
+        </MudButton>
+    }
+</MudPaper>
+
+@code {
+    [Inject]
+    private IDialogService DialogService { get; set; }
+
+    private bool finished = false;
+    int RoundsCompleted = 0;
+    DateTime startTime;
+    DateTime endTime;
+    List<Result> times = new();
+    private DateTime randomDate;
+    RandomDateCreater randDate = new();
+    bool start = false;
+    bool finishedRound = false;
+    private DateTime? _date = DateTime.Today;
+
+    private Task CellClicked(DateTime dateTime)
+    {
+        _date = dateTime;
+        return DialogService.ShowMessageBox("Date Selected", dateTime.ToString("MMMM dd, yyyy"));
+    }
+
+    private void RandomizeDate()
+    {
+        randomDate = randDate.RandomDay();
+        StartTime();
+        StateHasChanged();
+    }
+
+    private void OnSaveButtonClick()
+    {
+        RoundsCompleted++;
+        bool correct = _date?.Date == randomDate.Date;
+        EndTime();
+
+        times.Add(new Result(CalcTimeOfRound(), correct));
+
+        if (RoundsCompleted == 5)
+        {
+            EndExperiment();
+            return;
+        }
+
+        finishedRound = true;
+        StateHasChanged();
+    }
+
+    private void beginRound()
+    {
+        finishedRound = false;
+        RandomizeDate();
+        start = true;
+        StateHasChanged();
+    }
+
+    private void StartTime() => startTime = DateTime.Now;
+    private void EndTime() => endTime = DateTime.Now;
+    private double CalcTimeOfRound() => (endTime - startTime).TotalSeconds;
+
+    private void EndExperiment()
+    {
+        AppState.SmallCalendarCompletion = true;
+        AppState.SmallCalendarResults = times; // set results var
+        finished = true;
+        StateHasChanged();
+    }
+
+    private void ReturnHome()
+    {
+        NavigationManager.NavigateTo("/");
+    }
+
+
+}
+
+
